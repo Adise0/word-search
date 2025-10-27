@@ -1,0 +1,8 @@
+{
+  "watch": ["*.cpp", "*.h"],
+  "ext": "cpp,h",
+  "events": {
+    "start": "clear"
+  },
+  "exec": "build.bat && call build\\app.exe"
+}
