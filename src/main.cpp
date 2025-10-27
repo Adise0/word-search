@@ -85,13 +85,26 @@ int GetnOfWordSearch() {
 }
 
 void ShowWords(string words[]) {
+  Separator();
+  Space();
   WriteLn("You must find:");
+  Space();
+
   for (size_t i = 0; i < words->length(); i++) {
     if (words[i] != "") {
-      Write(words[i] + ", ");
+      bool isLastWord = (i >= (words->length() - 1)) || words[i + 1] == "";
+      Write(words[i] + (isLastWord ? "" : ", "));
     }
   }
 }
+
+string GetRandomLetter() {
+
+  int randomIndex = rand() % 26;
+  char letter = 'A' + randomIndex;
+  return string(1, letter);
+}
+
 
 void ConstructBoard(int size, int nOfWords, string words[], string letters[]) {
   bool isOcupied[MAX_SIZE * MAX_SIZE] = {false};
@@ -100,10 +113,8 @@ void ConstructBoard(int size, int nOfWords, string words[], string letters[]) {
   for (size_t i = 0; i < nOfWords; i++) {
     string word = words[i];
 
-    WriteLn("Word " + word);
     for (size_t j = 0; j < MAX_ATTEMPTS; j++) {
       bool isVertical = rand() % 2;
-      WriteLn((isVertical ? "Veritcal" : "Horizontal") + string() + " " + to_string(isVertical));
 
       if (isVertical) {
         int startRow = rand() % (size - word.length());
@@ -157,9 +168,20 @@ void ConstructBoard(int size, int nOfWords, string words[], string letters[]) {
   if (setWords < nOfWords) {
     throw new exception("Max attempts exceded");
   }
+
+
+  for (size_t i = 0; i < MAX_SIZE * MAX_SIZE; i++) {
+    if (!isOcupied[i]) {
+      letters[i] = GetRandomLetter();
+    }
+  }
 }
 
-void RenderBoard(int size, string letters[]) {
+
+
+void RenderBoard(int size, string letters[], string words[]) {
+
+  system("cls");
 
   for (size_t i = 0; i < size; i++) {
     for (size_t j = 0; j < size; j++) {
@@ -167,6 +189,9 @@ void RenderBoard(int size, string letters[]) {
     }
     Space();
   }
+
+  Space();
+  ShowWords(words);
 }
 
 
@@ -196,7 +221,7 @@ int main() {
     }
   }
 
-  ShowWords(selectedWords);
+
 
   Space();
   Separator();
@@ -205,5 +230,5 @@ int main() {
   string letters[MAX_SIZE * MAX_SIZE];
   fill(begin(letters), end(letters), "0");
   ConstructBoard(size, nOfWords, selectedWords, letters);
-  RenderBoard(size, letters);
+  RenderBoard(size, letters, selectedWords);
 }
