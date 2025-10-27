@@ -100,14 +100,18 @@ void ConstructBoard(int size, int nOfWords, string words[], string letters[]) {
   for (size_t i = 0; i < nOfWords; i++) {
     string word = words[i];
 
+    WriteLn("Word " + word);
     for (size_t j = 0; j < MAX_ATTEMPTS; j++) {
-      bool isVertical = rand() % 1;
+      bool isVertical = rand() % 2;
+      WriteLn((isVertical ? "Veritcal" : "Horizontal") + string() + " " + to_string(isVertical));
 
       if (isVertical) {
-        int startRow = rand() % size - word.length();
+        int startRow = rand() % (size - word.length());
         int startCol = rand() % size;
+
         bool isFree = true;
         int currentCell = 0;
+
         for (size_t k = 0; k < word.length(); k++) {
           currentCell = (startRow + k) * size + startCol;
 
@@ -120,14 +124,17 @@ void ConstructBoard(int size, int nOfWords, string words[], string letters[]) {
         for (size_t k = 0; k < word.length(); k++) {
           currentCell = (startRow + k) * size + startCol;
           letters[currentCell] = word[k];
+          isOcupied[currentCell] = true;
         }
         setWords++;
         break;
       } else {
         int startRow = rand() % size;
-        int startCol = rand() % size - word.length();
+        int startCol = rand() % (size - word.length());
+
         bool isFree = true;
         int currentCell = 0;
+
         for (size_t k = 0; k < word.length(); k++) {
           currentCell = startRow * size + startCol + k;
 
@@ -140,6 +147,7 @@ void ConstructBoard(int size, int nOfWords, string words[], string letters[]) {
         for (size_t k = 0; k < word.length(); k++) {
           currentCell = startRow * size + startCol + k;
           letters[currentCell] = word[k];
+          isOcupied[currentCell] = true;
         }
         setWords++;
         break;
@@ -171,8 +179,11 @@ int main() {
   int nOfWords = GetnOfWordSearch();
 
   string words[] = {WORDS};
-  bool isWordSelected[MAX_N_WORDS] = {false};
-  string selectedWords[MAX_N_WORDS] = {""};
+  bool isWordSelected[MAX_N_WORDS];
+  fill(begin(isWordSelected), end(isWordSelected), false);
+
+  string selectedWords[MAX_N_WORDS];
+  fill(begin(selectedWords), end(selectedWords), NULL);
 
 
   int insertIndex = 0;
@@ -191,7 +202,8 @@ int main() {
   Separator();
   Space();
 
-  string letters[MAX_SIZE * MAX_SIZE] = {"0"};
+  string letters[MAX_SIZE * MAX_SIZE];
+  fill(begin(letters), end(letters), "0");
   ConstructBoard(size, nOfWords, selectedWords, letters);
   RenderBoard(size, letters);
 }
