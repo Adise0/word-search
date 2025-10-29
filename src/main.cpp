@@ -1,5 +1,5 @@
-#include "iostream";
-#include <string>;
+#include "iostream"
+#include <string>
 
 using namespace std;
 
@@ -14,7 +14,10 @@ using namespace std;
 #define WORDS                                                                                                                                                                      \
   "MOUNTAIN", "OCEAN", "FOREST", "RIVER", "THUNDER", "LIGHTNING", "DESERT", "VOLCANO", "ISLAND", "GLACIER", "CANYON", "HURRICANE", "TORNADO", "EARTHQUAKE", "LAVA", "CLOUD",       \
       "STORM", "VALLEY", "WIND", "STONE"
+
+#define DEFAULT_LETTER "0"
 // #endregion
+
 
 
 // #region Utils
@@ -107,7 +110,6 @@ string GetRandomLetter() {
 
 
 void ConstructBoard(int size, int nOfWords, string words[], string letters[]) {
-  bool isOcupied[MAX_SIZE * MAX_SIZE] = {false};
   int setWords = 0;
 
   for (size_t i = 0; i < nOfWords; i++) {
@@ -120,22 +122,21 @@ void ConstructBoard(int size, int nOfWords, string words[], string letters[]) {
         int startRow = rand() % (size - word.length());
         int startCol = rand() % size;
 
-        bool isFree = true;
+        bool isAvailable = true;
         int currentCell = 0;
 
         for (size_t k = 0; k < word.length(); k++) {
           currentCell = (startRow + k) * size + startCol;
 
-          if (isOcupied[currentCell]) {
-            isFree = false;
+          if ((letters[currentCell] != "0") && letters[currentCell] != string(1, word[k])) {
+            isAvailable = false;
             break;
           }
         }
-        if (!isFree) continue;
+        if (!isAvailable) continue;
         for (size_t k = 0; k < word.length(); k++) {
           currentCell = (startRow + k) * size + startCol;
           letters[currentCell] = word[k];
-          isOcupied[currentCell] = true;
         }
         setWords++;
         break;
@@ -143,22 +144,21 @@ void ConstructBoard(int size, int nOfWords, string words[], string letters[]) {
         int startRow = rand() % size;
         int startCol = rand() % (size - word.length());
 
-        bool isFree = true;
+        bool isAvailable = true;
         int currentCell = 0;
 
         for (size_t k = 0; k < word.length(); k++) {
           currentCell = startRow * size + startCol + k;
 
-          if (isOcupied[currentCell]) {
-            isFree = false;
+          if ((letters[currentCell] != "0") && letters[currentCell] != string(1, word[k])) {
+            isAvailable = false;
             break;
           }
         }
-        if (!isFree) continue;
+        if (!isAvailable) continue;
         for (size_t k = 0; k < word.length(); k++) {
           currentCell = startRow * size + startCol + k;
           letters[currentCell] = word[k];
-          isOcupied[currentCell] = true;
         }
         setWords++;
         break;
@@ -171,7 +171,7 @@ void ConstructBoard(int size, int nOfWords, string words[], string letters[]) {
 
 
   for (size_t i = 0; i < MAX_SIZE * MAX_SIZE; i++) {
-    if (!isOcupied[i]) {
+    if (letters[i] == "0") {
       letters[i] = GetRandomLetter();
     }
   }
@@ -202,8 +202,10 @@ int main() {
 
   int size = GetBoardSize();
   int nOfWords = GetnOfWordSearch();
-
   string words[] = {WORDS};
+
+
+
   bool isWordSelected[MAX_N_WORDS];
   fill(begin(isWordSelected), end(isWordSelected), false);
 
@@ -215,8 +217,12 @@ int main() {
   for (size_t i = 0; i < nOfWords; i++) {
     while (!isWordSelected[i]) {
       int newWord = rand() % nOfWords;
-      isWordSelected[i] = true;
+
+
+      if (words[i].length() > size) continue;
+
       selectedWords[insertIndex] = words[i];
+      isWordSelected[i] = true;
       insertIndex++;
     }
   }
@@ -228,7 +234,14 @@ int main() {
   Space();
 
   string letters[MAX_SIZE * MAX_SIZE];
-  fill(begin(letters), end(letters), "0");
-  ConstructBoard(size, nOfWords, selectedWords, letters);
+  fill(begin(letters), end(letters), DEFAULT_LETTER);
+  try {
+
+    ConstructBoard(size, nOfWords, selectedWords, letters);
+  } catch (...) {
+    WriteLn("Max attempts exceded!");
+    return 1;
+  }
+
   RenderBoard(size, letters, selectedWords);
 }
